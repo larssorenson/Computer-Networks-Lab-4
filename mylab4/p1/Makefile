@@ -3,7 +3,7 @@ DEBUG		=-U Debug
 FLAGS		=-g -Wall -std=c99 $(DEBUG)
 EXECUTABLE	=fsserver
 SOURCES		=$(EXECUTABLE).c
-HEADERS		=fsserver.h
+HEADERS		=fs.h
 OBJECTS		=$(SOURCES:.c=.o)
 RM		=rm -rf
 
