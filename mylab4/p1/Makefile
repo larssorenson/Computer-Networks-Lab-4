@@ -1,8 +1,8 @@
 CC		=gcc
 DEBUG		=-U Debug
-FLAGS		=-g -Wall -std=c99 $(DEBUG) $(EXEC) $(TEST)
+FLAGS		=-g -Wall $(DEBUG) $(EXEC) $(TEST)
 EXECUTABLE	=fsserver
-SOURCES		=$(EXECUTABLE).c printUsage.c parseAndCheckPort.c mallocAndCheck.c bindUDPSocket.c numberFromString.c
+SOURCES		=$(EXECUTABLE).c printUsage.c parseAndCheckPort.c mallocAndCheck.c bindUDPSocket.c setChildHandler.c handleChild.c numberFromString.c
 HEADERS		=fs.h
 OBJECTS		=$(SOURCES:.c=.o)
 RM		=rm -rf

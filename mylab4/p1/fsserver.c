@@ -31,6 +31,12 @@ int main (int argc, char** argv)
 	if (port < 0)
 		return IMPROPER_ARGUMENTS;
 	
+	if(setChildHandler())
+	{
+		perror("Child Handler");
+		return FUNCTION_ERROR;
+	}
+	
 	// Malloc space for the buffer and zero it
 	char* buffer = mallocAndCheck(1024);
 	memset(buffer, 0, 1024);
@@ -52,21 +58,21 @@ int main (int argc, char** argv)
 	if(tcpSocket <= 0)
 	{
 		write(2, "Unable to bind socket!\r\n", 24);
-		return -1;
+		return FUNCTION_ERROR;
 	}
 	
 	// Bind up the socket to myself
 	if(bind(tcpSocket, (struct sockaddr*)&myaddr, sizeof(struct sockaddr)))
 	{
 		perror("Bind");
-		return -1;
+		return FUNCTION_ERROR;
 	}
 	
 	// Listen on said socket
 	if(listen(tcpSocket, 1) != 0)
 	{
 		perror("Listen");
-		return -1;
+		return FUNCTION_ERROR;
 	}
 	
 	int new_socket;
@@ -77,8 +83,10 @@ int main (int argc, char** argv)
 		if((new_socket = accept(tcpSocket, (struct sockaddr *)&clientaddr, &addrlen)) < 0)
 		{
 			perror("Accept");
-			return -1;
+			return FUNCTION_ERROR;
 		}
+
+		memset(buffer, 0, 1024);
 
 		// receive the message
 		while(read(new_socket, buffer, 1024) <= 0)
@@ -95,8 +103,10 @@ int main (int argc, char** argv)
 			if(write(new_socket, "INVALID_REQUEST", 15) <= 0)
 			{
 				perror("Invalid Request");
-				return 1;
+				return FUNCTION_ERROR;
 			}
+			
+			continue;
 		}
 		
 		// FORKING TIME!
@@ -106,6 +116,7 @@ int main (int argc, char** argv)
 		if (pid == -1)
 		{
 			perror("Fork");
+			return FUNCTION_ERROR;
 		}
 		
 		// Child case
@@ -120,6 +131,7 @@ int main (int argc, char** argv)
 			if(fd < 0)
 			{
 				perror("Open");
+				return FUNCTION_ERROR;
 			}
 			
 			int count = 1024;
@@ -132,7 +144,7 @@ int main (int argc, char** argv)
 				if(write(new_socket, file, count) <= 0)
 				{
 					perror("File Send");
-					return 1;
+					return FUNCTION_ERROR;
 				}
 			
 				if (count < 1024)
