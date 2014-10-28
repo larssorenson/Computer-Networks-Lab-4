@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <wait.h>
+#define FILE_SIZE 131072
 
 enum ERROR				/* Defines ERROR Enumeration 					*/
 {

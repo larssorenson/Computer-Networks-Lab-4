@@ -15,8 +15,8 @@ int main(int argc, char** argv)
 		return IMPROPER_ARGUMENTS;
 	
 	// Malloc our buffer for the file
-	char *buffer = mallocAndCheck(sizeof(char)*1025);
-	memset(buffer, 0, 1025);
+	char *buffer = mallocAndCheck(sizeof(char)*FILE_SIZE);
+	memset(buffer, 0, FILE_SIZE);
 	
 	// Get the length of our file
 	int filelen = strlen(argv[3]);
@@ -50,6 +50,10 @@ int main(int argc, char** argv)
 		return FUNCTION_ERROR;
 	}
 	
+	// Timestamp before we send the packet
+	struct timeval before;
+	gettimeofday(&before, NULL);
+	struct timeval after;
 	if(write(tcpSocket, argv[3], filelen) < 0)
 	{
 		perror("Write");
@@ -69,23 +73,11 @@ int main(int argc, char** argv)
 		printf("Local File: %s\r\n", cwd);
 	#endif
 	
-	
-	
-	int count = 1024;
-	
-	// Read and write on response
-	while( 1 )
+	int count = read(tcpSocket, buffer, FILE_SIZE);
+	int total = 0;
+	if(count != 0 && strcmp(buffer, "INVALID_REQUEST"))
 	{
-		// Busy wait for response
-		while((count = read(tcpSocket, buffer, 1024)) == 0)
-		{}
-		
-		if(!strcmp(buffer, "INVALID_REQUEST"))
-		{
-			printf("Invalid file specified. Please check the arguments.\r\n");
-			return IMPROPER_ARGUMENTS;
-		}
-		
+	
 		// Open and/or create the file we're going to be copying to
 		int fd = open(cwd, O_WRONLY | O_CREAT, S_IRWXU);
 		if(fd <= 0)
@@ -95,12 +87,33 @@ int main(int argc, char** argv)
 		}
 		
 		write(fd, buffer, count);
+		total += count;
+		#ifdef Debug
+			printf("Bytes Received So Far: %d\r\n", total);
+		#endif
+		// Busy wait for response
+		while((count = read(tcpSocket, buffer, FILE_SIZE)) != 0)
+		{
+			write(fd, buffer, count);
+			total += count;
+			#ifdef Debug
+				printf("Bytes Received So Far: %d\r\n", total);
+			#endif
+			memset(buffer, 0, FILE_SIZE);
+			if(count != FILE_SIZE)
+				break;
+		}
 		
+		gettimeofday(&after, NULL);
 		close(fd);
-		if (count != 1024)
-			break;
+		printf("File Received! Total Bytes Received: %d in %d nanoseconds\r\n", total, (int)(after.tv_usec - before.tv_usec));
 	}
 	
+	else
+	{
+		printf("Invalid file specified. Please check the arguments.\r\n");
+		return IMPROPER_ARGUMENTS;
+	}
 	
 	return OK;
 }

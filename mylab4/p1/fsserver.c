@@ -38,8 +38,8 @@ int main (int argc, char** argv)
 	}
 	
 	// Malloc space for the buffer and zero it
-	char* buffer = mallocAndCheck(1024);
-	memset(buffer, 0, 1024);
+	char* buffer = mallocAndCheck(FILE_SIZE);
+	memset(buffer, 0, FILE_SIZE);
 	
 	// Var to hold the size of the sock struct
 	socklen_t addrlen = (socklen_t)sizeof(struct sockaddr_storage);
@@ -86,10 +86,10 @@ int main (int argc, char** argv)
 			return FUNCTION_ERROR;
 		}
 
-		memset(buffer, 0, 1024);
+		memset(buffer, 0, FILE_SIZE);
 
 		// receive the message
-		while(read(new_socket, buffer, 1024) <= 0)
+		while(read(new_socket, buffer, FILE_SIZE) <= 0)
 		{}
 		
 		// Debugging, output which file was requested
@@ -123,8 +123,8 @@ int main (int argc, char** argv)
 		else if (pid == 0)
 		{
 			// Malloc space for buffering the file as we read/write
-			char* file = mallocAndCheck(1025);
-			memset(file, 0, 1025);
+			char* file = mallocAndCheck(FILE_SIZE);
+			memset(file, 0, FILE_SIZE);
 			
 			// Open the file for read only
 			int fd = open(buffer, O_RDONLY);
@@ -134,24 +134,31 @@ int main (int argc, char** argv)
 				return FUNCTION_ERROR;
 			}
 			
-			int count = 1024;
-		
+			int count = FILE_SIZE;
+			int total = 0;
+			// Timestamp before we send the packet
+			struct timeval before;
+			gettimeofday(&before, NULL);
+			struct timeval after;
 			while( INF )
 			{
-				count = read(fd, file, 1024);
+				memset(file, 0, FILE_SIZE);
+				count = read(fd, file, FILE_SIZE);
 			
 				// Send the file requested
-				if(write(new_socket, file, count) <= 0)
+				if(write(new_socket, file, count) < 0)
 				{
 					perror("File Send");
 					return FUNCTION_ERROR;
 				}
-			
-				if (count < 1024)
+				total += count;
+				if (count < FILE_SIZE)
 					break;
 			
 			}
 			
+			gettimeofday(&after, NULL);
+			printf("Read and Write Time: %d bytes in %d nanoseconds\r\n", total, (int)(after.tv_usec - before.tv_usec));
 			close(new_socket);
 			
 		}
