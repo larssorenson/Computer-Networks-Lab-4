@@ -34,8 +34,6 @@ int main(int argc, char** argv)
 	
 	setPacketHandler();
 	setAlarmHandler();
-	
-	struct termios term1, term2;
 
 	// remember original terminal setting
 	tcgetattr(0, &term1);
@@ -193,13 +191,13 @@ int main(int argc, char** argv)
 				// Populate the address struct
 				int chatPort = numberFromString(strport);
 				chataddr.sin_port = htons(chatPort);
-				chataddr.sin_family = AF_INET
+				chataddr.sin_family = AF_INET;
 				
 				// Send chat request
 				sendto(udpSocket, "letschat", 8, 0, (struct sockaddr*)&chataddr, addrlen);
 				
 				// Alarm for 5 minutes
-				setAlarm(5 * 60);
+				setAlarm(5);
 			}
 			
 		}
@@ -208,7 +206,7 @@ int main(int argc, char** argv)
 	
 	
 	tcsetattr(0, TCSANOW, &term1);	// return terminal to default mode
-	
+	alarm(0);
 	
 	return OK;
 }

@@ -23,6 +23,7 @@ enum ERROR				/* Defines ERROR Enumeration 					*/
 
 
 struct sockaddr_in chataddr;
+struct termios term1, term2;
 
 void printUsage();
 int parseAndCheckPort(char* port);
@@ -35,3 +36,4 @@ int setPacketHandler();
 int bindUDPSocket();
 void setAlarm(int time);
 int setAlarmHandler();
+void noResponse();

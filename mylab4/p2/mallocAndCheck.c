@@ -8,6 +8,7 @@ void* mallocAndCheck(size_t size)
 	if (!res)
 	{
 		perror("Malloc Failed");
+		tcsetattr(0, TCSANOW, &term1);	// return terminal to default mode
 		exit(1);
 	}
 	
