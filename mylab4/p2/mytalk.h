@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <wait.h>
-#define FILE_SIZE 131072
+#include <termios.h>
 
 enum ERROR				/* Defines ERROR Enumeration 					*/
 {
@@ -21,9 +21,17 @@ enum ERROR				/* Defines ERROR Enumeration 					*/
 	FUNCTION_ERROR = -3		/* Error code for a function call failing			*/
 };
 
+
+struct sockaddr_in chataddr;
+
 void printUsage();
 int parseAndCheckPort(char* port);
 void* mallocAndCheck(size_t size);
 int numberFromString(char* str);
 void handleChild(int sig);
 int setChildHandler();
+void handlePacket(int sig);
+int setPacketHandler();
+int bindUDPSocket();
+void setAlarm(int time);
+int setAlarmHandler();
