@@ -24,6 +24,10 @@ enum ERROR				/* Defines ERROR Enumeration 					*/
 
 struct sockaddr_in chataddr;
 struct termios term1, term2;
+socklen_t addrlen;
+int udpSocket;
+int inChat;
+char* commandLineBuffer;
 
 void printUsage();
 int parseAndCheckPort(char* port);
@@ -31,9 +35,10 @@ void* mallocAndCheck(size_t size);
 int numberFromString(char* str);
 void handleChild(int sig);
 int setChildHandler();
-void handlePacket(int sig);
+void handlePacket(int sig, siginfo_t* siginf, void* ucontext);
 int setPacketHandler();
 int bindUDPSocket();
 void setAlarm(int time);
 int setAlarmHandler();
 void noResponse();
+void printTerminal();

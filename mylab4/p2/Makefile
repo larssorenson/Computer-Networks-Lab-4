@@ -1,8 +1,8 @@
 CC		=gcc
 DEBUG		=-U Debug
-FLAGS		=-g -Wall $(DEBUG) $(EXEC) $(TEST)
+FLAGS		=-g -Wall $(DEBUG) $(TEST)
 EXECUTABLE	=mytalk
-SOURCES		=$(EXECUTABLE).c printUsage.c parseAndCheckPort.c mallocAndCheck.c bindUDPSocket.c setChildHandler.c handleChild.c numberFromString.c setPacketHandler.c handlePacket.c noResponse.c setAlarm.c setAlarmHandler.c
+SOURCES		=$(EXECUTABLE).c printUsage.c parseAndCheckPort.c mallocAndCheck.c bindUDPSocket.c setChildHandler.c handleChild.c numberFromString.c setPacketHandler.c handlePacket.c noResponse.c setAlarm.c setAlarmHandler.c printTerminal.c
 HEADERS		=mytalk.h
 OBJECTS		=$(SOURCES:.c=.o)
 RM		=rm -rf

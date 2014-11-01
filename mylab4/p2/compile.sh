@@ -12,4 +12,4 @@ then
 	TEST="-D"
 fi
 
-make all EXECUTABLE=mytalk DEBUG="$DEBUG Debug" EXEC="-D Server" TEST="$TEST Testing"
+make all EXECUTABLE=mytalk DEBUG="$DEBUG Debug" TEST="$TEST Testing"
